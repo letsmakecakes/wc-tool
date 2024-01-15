@@ -53,6 +53,6 @@ func TestNumberOfCharacters(t *testing.T) {
 
 	want := "339292 test.txt"
 	if got != want {
-		t.Error("Strings don't match")
+		t.Errorf("Strings don't match: %s", got)
 	}
 }
