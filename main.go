@@ -1,52 +1,32 @@
 package main
 
 import (
+	"flag"
 	log "github.com/sirupsen/logrus"
 	"os"
-	"strings"
+	"wc"
 )
 
 func main() {
-	// Create a log file with error handling
-	file, err := os.Create("./log/log.txt")
+	// Define command-line flags
+	option := flag.String("c", "-c", "Specify the counting option: -c, -l, -w, -m")
+	flag.Parse()
+
+	// Get the filename from the remaining command line arguments
+	args := flag.Args()
+	if len(args) == 0 {
+		log.Println("Usage: go run main.go -<option> <filename>")
+		os.Exit(1)
+	}
+
+	filename := args[1]
+
+	// Perform word count based on the provided option
+	result, err := wc.WC(*option, filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			log.Error(err)
-		}
-	}()
 
-	log.SetOutput(file)
-
-	// Log a test entry
-	log.Println("This is a test entry")
-
-	// Handle command-line arguments
-	args := os.Args
-	log.Println("Arguments:", args)
-
-	if len(args) < 4 {
-		log.Error("Invalid usage: wc [-c|-w|-l] <filename.txt>")
-		os.Exit(1)
-	}
-
-	if args[1] != "wc" {
-		log.Error("Invalid command")
-		os.Exit(1)
-	}
-
-	if args[2] != "-c" && args[2] != "-w" && args[2] != "-l" {
-		log.Error("Invalid option")
-		os.Exit(1)
-	}
-
-	filename := args[3]
-	ext := strings.Split(filename, ".")
-	if len(ext) < 2 || ext[1] != "txt" {
-		log.Error("Unsupported file type or missing extension")
-		os.Exit(1)
-	}
+	// Print the result
+	log.Println(result)
 }

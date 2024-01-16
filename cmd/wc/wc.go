@@ -7,16 +7,10 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
-type WordCount struct {
-	file  string
-	words int
-	lines int
-	bytes int
-}
-
-func wc(option string, file string) (string, error) {
+func WC(option string, file string) (string, error) {
 	if option == "-c" {
 		return getByteCount(file)
 	} else if option == "-l" {
@@ -32,6 +26,7 @@ func wc(option string, file string) (string, error) {
 	return "", errors.New(err)
 }
 
+// Function to get the byte count in a file
 func getByteCount(file string) (string, error) {
 	// Read the file
 	fd, err := ioutil.ReadFile(file)
@@ -63,6 +58,7 @@ func getLineCount(file string) (string, error) {
 	return result, nil
 }
 
+// Function to get word count in a file
 func getWordCount(file string) (string, error) {
 	fd, err := os.Open(file)
 	if err != nil {
@@ -128,5 +124,23 @@ func getCharacterCount(file string) (string, error) {
 }
 
 func getAllCount(file string) (string, error) {
+	byteCount, err := getByteCount(file)
+	if err != nil {
+		return "", err
+	}
+	lineCount, err := getLineCount(file)
+	if err != nil {
+		return "", err
+	}
+	wordCount, err := getWordCount(file)
+	if err != nil {
+		return "", err
+	}
 
+	bytes := strings.Split(byteCount, " ")
+	lines := strings.Split(lineCount, " ")
+	words := strings.Split(wordCount, " ")
+
+	result := fmt.Sprintf("%s   %s  %s %s", lines[0], words[0], bytes[0], file)
+	return result, nil
 }

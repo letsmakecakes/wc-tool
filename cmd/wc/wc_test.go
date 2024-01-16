@@ -6,20 +6,20 @@ import (
 
 func TestNumberOfBytes(t *testing.T) {
 	fileName := "test.txt"
-	got, err := wc("-c", fileName)
+	got, err := WC("-c", fileName)
 	if err != nil {
 		t.Error(err)
 	}
 
 	want := "342190 test.txt"
 	if got != want {
-		t.Error("Strings don't match")
+		t.Errorf("Got: %s, want: %s", got, want)
 	}
 }
 
 func TestNumberOfLines(t *testing.T) {
 	fileName := "test.txt"
-	got, err := wc("-l", fileName)
+	got, err := WC("-l", fileName)
 	if err != nil {
 		t.Error(err)
 	}
@@ -33,7 +33,7 @@ func TestNumberOfLines(t *testing.T) {
 
 func TestNumberOfWords(t *testing.T) {
 	fileName := "test.txt"
-	got, err := wc("-w", fileName)
+	got, err := WC("-w", fileName)
 	if err != nil {
 		t.Error(err)
 	}
@@ -46,7 +46,7 @@ func TestNumberOfWords(t *testing.T) {
 
 func TestNumberOfCharacters(t *testing.T) {
 	fileName := "test.txt"
-	got, err := wc("-m", fileName)
+	got, err := WC("-m", fileName)
 	if err != nil {
 		t.Error(err)
 	}
@@ -54,5 +54,18 @@ func TestNumberOfCharacters(t *testing.T) {
 	want := "339292 test.txt"
 	if got != want {
 		t.Errorf("Strings don't match: %s", got)
+	}
+}
+
+func TestAllOptions(t *testing.T) {
+	fileName := "test.txt"
+	got, err := WC("", fileName)
+	if err != nil {
+		t.Error(err)
+	}
+
+	want := "7145   58164  342190 test.txt"
+	if got != want {
+		t.Errorf("No match: %s", got)
 	}
 }
