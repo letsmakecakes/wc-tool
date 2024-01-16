@@ -7,7 +7,6 @@ A simple implementation of the `wc` (word count) command in Golang. This project
 - [About the Project](#about-the-project)
 - [Usage](#usage)
 - [Options](#options)
-- [Getting Started](#getting-started)
 
 ## About the Project
 
@@ -82,19 +81,4 @@ go run main.go -m example.txt
 ```bash
 go run main.go example.txt
 # Output: 10 35 123 example.txt
-```
-
-## Getting Started
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/your-wc-project.git
-cd your-wc-project
-```
-
-2. Run the example:
-
-```bash
-go run main.go -c example.txt
 ```
