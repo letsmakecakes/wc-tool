@@ -37,6 +37,7 @@ func getByteCount(file string) (string, error) {
 	return result, nil
 }
 
+// Function to get the line count in a file
 func getLineCount(file string) (string, error) {
 	fd, err := os.Open(file)
 	if err != nil {
@@ -86,6 +87,7 @@ func getWordCount(file string) (string, error) {
 	return result, nil
 }
 
+// Function to get character count
 func getCharacterCount(file string) (string, error) {
 	// Open the file
 	fd, err := os.Open(file)
@@ -123,6 +125,7 @@ func getCharacterCount(file string) (string, error) {
 	return result, nil
 }
 
+// Function get count of bytes, lines and words
 func getAllCount(file string) (string, error) {
 	byteCount, err := getByteCount(file)
 	if err != nil {
