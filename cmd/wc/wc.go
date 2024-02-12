@@ -11,19 +11,48 @@ import (
 )
 
 func WC(option string, file string) (string, error) {
-	if option == "-c" {
+	if isByteCount(option) {
 		return getByteCount(file)
-	} else if option == "-l" {
+	}
+
+	if isLineCount(option) {
 		return getLineCount(file)
-	} else if option == "-w" {
+	}
+
+	if isWordCount(option) {
 		return getWordCount(file)
-	} else if option == "-m" {
+	}
+
+	if isCharacterCount(option) {
 		return getCharacterCount(file)
-	} else if option == "" {
+	}
+
+	if isEmpty(option) {
 		return getAllCount(file)
 	}
+
 	err := fmt.Sprintf("Invalid option")
 	return "", errors.New(err)
+}
+
+func isByteCount(option string) bool {
+	return option == "-c"
+}
+
+func isLineCount(option string) bool {
+	return option == "-l"
+}
+
+func isWordCount(option string) bool {
+	return option == "-w"
+}
+
+func isCharacterCount(option string) bool {
+	return option == "-m"
+}
+
+func isEmpty(option string) bool {
+	return option == ""
 }
 
 // Function to get the byte count in a file
@@ -68,7 +97,7 @@ func getWordCount(file string) (string, error) {
 	defer func(fd *os.File) {
 		err := fd.Close()
 		if err != nil {
-
+			fmt.Errorf("error in closing the file")
 		}
 	}(fd)
 
@@ -146,4 +175,13 @@ func getAllCount(file string) (string, error) {
 
 	result := fmt.Sprintf("%s   %s  %s %s", lines[0], words[0], bytes[0], file)
 	return result, nil
+}
+
+func openFile(file string) *os.File {
+	fd, err := os.Open(file)
+	if err != nil {
+		panic("error in opening the file")
+	}
+
+	return fd
 }
