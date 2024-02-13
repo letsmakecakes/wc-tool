@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"strings"
@@ -57,7 +58,12 @@ func isEmpty(option string) bool {
 // Function to get the byte count in a file
 func getByteCount(file string) (string, error) {
 	fd := openFile(file)
-	defer fd.Close()
+	defer func(fd *os.File) {
+		err := fd.Close()
+		if err != nil {
+
+		}
+	}(fd)
 
 	count := countBytes(fd)
 	result := fmt.Sprintf("%d %s", count, file)
@@ -113,7 +119,7 @@ func getWordCount(file string) (string, error) {
 	defer func(fd *os.File) {
 		err := fd.Close()
 		if err != nil {
-			fmt.Errorf("error in closing the file")
+			log.Errorf("error in closing the file")
 		}
 	}(fd)
 
