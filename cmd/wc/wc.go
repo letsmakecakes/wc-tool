@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -57,13 +56,30 @@ func isEmpty(option string) bool {
 
 // Function to get the byte count in a file
 func getByteCount(file string) (string, error) {
-	// Read the file
-	fd, err := ioutil.ReadFile(file)
-	if err != nil {
-		return "", err
-	}
-	result := fmt.Sprintf("%d %s", len(fd), file)
+	fd := openFile(file)
+	defer fd.Close()
+
+	count := countBytes(fd)
+	result := fmt.Sprintf("%d %s", count, file)
 	return result, nil
+}
+
+func countBytes(fd *os.File) int {
+	reader := bufio.NewReader(fd)
+	byteCount := 0
+
+	for {
+		_, err := reader.ReadByte()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			fmt.Println("error reading:", err)
+			return 0
+		}
+		byteCount++
+	}
+
+	return byteCount
 }
 
 // Function to get the line count in a file
