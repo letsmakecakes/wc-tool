@@ -10,6 +10,15 @@ import (
 	"strings"
 )
 
+type fileStats struct {
+	byteCount      int
+	lineCount      int
+	wordCount      int
+	characterCount int
+}
+
+var wc fileStats
+
 func WC(option string, file string) (string, error) {
 	if isByteCount(option) {
 		return getByteCount(file)
@@ -58,15 +67,10 @@ func isEmpty(option string) bool {
 // Function to get the byte count in a file
 func getByteCount(file string) (string, error) {
 	fd := openFile(file)
-	defer func(fd *os.File) {
-		err := fd.Close()
-		if err != nil {
+	defer closeFile(fd)
 
-		}
-	}(fd)
-
-	count := countBytes(fd)
-	result := fmt.Sprintf("%d %s", count, file)
+	wc.byteCount = countBytes(fd)
+	result := fmt.Sprintf("%d %s", wc.byteCount, file)
 	return result, nil
 }
 
@@ -206,4 +210,13 @@ func openFile(file string) *os.File {
 	}
 
 	return fd
+}
+
+func closeFile(file *os.File) {
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Errorf("error in closing the file: %v", err)
+		}
+	}(file)
 }
