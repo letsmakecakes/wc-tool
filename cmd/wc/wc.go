@@ -10,15 +10,6 @@ import (
 	"strings"
 )
 
-type fileStats struct {
-	byteCount      int
-	lineCount      int
-	wordCount      int
-	characterCount int
-}
-
-var wc fileStats
-
 func WC(option string, file string) (string, error) {
 	if isByteCount(option) {
 		return getByteCount(file)
@@ -69,12 +60,16 @@ func getByteCount(file string) (string, error) {
 	fd := openFile(file)
 	defer closeFile(fd)
 
-	wc.byteCount = countBytes(fd)
-	result := fmt.Sprintf("%d %s", wc.byteCount, file)
+	bytes, err := countBytes(fd)
+	if err != nil {
+		return "", err
+	}
+
+	result := fmt.Sprintf("%d %s", bytes, file)
 	return result, nil
 }
 
-func countBytes(fd *os.File) int {
+func countBytes(fd *os.File) (int, error) {
 	reader := bufio.NewReader(fd)
 	byteCount := 0
 
@@ -83,101 +78,97 @@ func countBytes(fd *os.File) int {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			fmt.Println("error reading:", err)
-			return 0
+			return 0, err
 		}
 		byteCount++
 	}
 
-	return byteCount
+	return byteCount, nil
 }
 
 // Function to get the line count in a file
 func getLineCount(file string) (string, error) {
-	fd, err := os.Open(file)
+	fd := openFile(file)
+	defer closeFile(fd)
+
+	lines, err := countLines(fd)
 	if err != nil {
 		return "", err
 	}
-	defer func(fd *os.File) {
-		err := fd.Close()
-		if err != nil {
 
-		}
-	}(fd)
+	result := fmt.Sprintf("%d %s", lines, file)
+	return result, nil
+}
+
+func countLines(fd *os.File) (int, error) {
 	scanner := bufio.NewScanner(fd)
 	lineCount := 0
 	for scanner.Scan() {
 		lineCount++
 	}
 
-	result := fmt.Sprintf("%d %s", lineCount, file)
-	return result, nil
+	return lineCount, nil
 }
 
 // Function to get word count in a file
 func getWordCount(file string) (string, error) {
-	fd, err := os.Open(file)
+	fd := openFile(file)
+	defer closeFile(fd)
+
+	words, err := countWords(fd)
 	if err != nil {
 		return "", err
 	}
-	defer func(fd *os.File) {
-		err := fd.Close()
-		if err != nil {
-			log.Errorf("error in closing the file")
-		}
-	}(fd)
 
+	result := fmt.Sprintf("%d %s", words, file)
+	return result, nil
+}
+
+func countWords(fd *os.File) (int, error) {
 	scanner := bufio.NewScanner(fd)
 	scanner.Split(bufio.ScanWords)
 
-	countWords := 0
+	wordCount := 0
 	for scanner.Scan() {
-		countWords++
+		wordCount++
 	}
 	if err := scanner.Err(); err != nil {
-		return "", err
+		return 0, err
 	}
 
-	result := fmt.Sprintf("%d %s", countWords, file)
-	return result, nil
+	return wordCount, nil
 }
 
 // Function to get character count
 func getCharacterCount(file string) (string, error) {
-	// Open the file
-	fd, err := os.Open(file)
+	fd := openFile(file)
+	defer closeFile(fd)
+
+	characters, err := countCharacters(fd)
 	if err != nil {
 		return "", err
 	}
-	defer func(fd *os.File) {
-		err := fd.Close()
-		if err != nil {
 
-		}
-	}(fd)
+	result := fmt.Sprintf("%d %s", characters, file)
+	return result, nil
+}
 
-	// Create a new bufio reader
+func countCharacters(fd *os.File) (int, error) {
 	reader := bufio.NewReader(fd)
+	var characterCount int
 
-	// Create a variable to store the number of characters
-	var numChars int
-
-	// Read the file line by line
 	for {
-		// Read a character from the file
 		_, _, err := reader.ReadRune()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			return "", err
+			return 0, err
 		}
-		numChars++
+		characterCount++
 	}
 
-	// return the number of characters
-	result := fmt.Sprintf("%d %s", numChars, file)
-	return result, nil
+	return characterCount, nil
 }
 
 // Function get count of bytes, lines and words
@@ -213,7 +204,7 @@ func openFile(file string) *os.File {
 }
 
 func closeFile(file *os.File) {
-	defer func(file *os.File) {
+	func(file *os.File) {
 		err := file.Close()
 		if err != nil {
 			log.Errorf("error in closing the file: %v", err)
