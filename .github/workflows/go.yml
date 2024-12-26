@@ -1,0 +1,53 @@
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.23' ]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Run go vet
+      run: go vet ./...
+
+    - name: Run tests with coverage
+      run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+    - name: Build
+      run: |
+        go build -v -o wc ./cmd/wc
+        ./wc -v || true
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.txt
+        flags: unittests
+        fail_ci_if_error: true
+
+    - name: Archive binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: wc-${{ runner.os }}-${{ matrix.go-version }}
+        path: wc
+        retention-days: 5
