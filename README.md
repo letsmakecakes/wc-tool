@@ -1,84 +1,69 @@
-# WC - Word Count Command in Golang
+# WC - Word Count
 
-A simple implementation of the `wc` (word count) command in Golang. This project provides basic functionality to count lines, words, characters, and bytes in a file.
+A clone of the Unix `wc` utility written in Go, implementing the core functionality of counting bytes, lines, words, and characters in text files.
 
-## Table of Contents
+## Features
 
-- [About the Project](#about-the-project)
-- [Usage](#usage)
-- [Options](#options)
+- Count bytes (-c)
+- Count lines (-l)
+- Count words (-w)
+- Count characters (-m)
+- Default mode (equivalent to -c -l -w)
+- Support for file input and standard input
+- Unicode support
 
-## About the Project
+## Building
 
-The `wc` command is a utility in Unix and Unix-like operating systems that provides line, word, and byte count options. This Golang implementation offers a subset of the `wc` functionality.
+```bash
+go build -o wc ./cmd/wc
+```
 
 ## Usage
 
-To use this `wc` implementation, run the following command:
-
 ```bash
-go run main.go -<option> <filename>
+# Count bytes
+./wc -c test.txt
+
+# Count lines
+./wc -l test.txt
+
+# Count words
+./wc -w test.txt
+
+# Count characters
+./wc -m test.txt
+
+# Default mode (lines, words, bytes)
+./wc test.txt
+
+# Read from standard input
+cat test.txt | ./wc -l
 ```
 
-Replace `<option>` with one of the following:
-
-- `-c` : Byte count
-- `-l` : Line count
-- `-w` : Word count
-- `-m` : Character count
-- (No option) : Display line, word, byte count
-
-Replace `<filename>` with the path to the file you want to analyze.
-
-Example:
+## Testing
 
 ```bash
-go run main.go -l sample.txt
+go test ./...
 ```
 
-## Options
+## Project Structure
 
-- `-c` : Display the byte count.
-- `-l` : Display the line count.
-- `-w` : Display the word count.
-- `-m` : Display the character count.
-- (No option) : Display all counts (lines, words, bytes).
-
-### Sample Output Cases
-
-Assuming your `main.go` is set up to handle command-line arguments and call the appropriate `wc` function:
-
-#### Byte Count (`-c`)
-
-```bash
-go run main.go -c example.txt
-# Output: 123 example.txt
+```
+wc/
+├── cmd/
+│   └── wc/
+│       └── main.go       # Entry point
+├── internal/
+│   └── counter/
+│       ├── counter.go    # Core counting logic
+│       └── counter_test.go
+├── pkg/
+│   └── utils/
+│       └── utils.go      # Utility functions
+├── go.mod
+└── README.md
 ```
 
-#### Line Count (`-l`)
+## License
 
-```bash
-go run main.go -l example.txt
-# Output: 10 example.txt
-```
-
-#### Word Count (`-w`)
-
-```bash
-go run main.go -w example.txt
-# Output: 35 example.txt
-```
-
-#### Character Count (`-m`)
-
-```bash
-go run main.go -m example.txt
-# Output: 157 example.txt
-```
-
-#### All Counts (No Option)
-
-```bash
-go run main.go example.txt
-# Output: 10 35 123 example.txt
-```
+MIT License
